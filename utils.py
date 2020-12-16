@@ -13,3 +13,4 @@ def check_positive(x: float):
 
 def check_absolute_error(x: float, y: float, error: float):
     assert math.fabs(x-y) <= error
+    print("error =",math.fabs(x-y))

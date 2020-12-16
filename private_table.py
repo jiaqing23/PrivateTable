@@ -58,8 +58,12 @@ class PrivateTable:
             if not np.all(self._dataframe[col].apply(domains[col].contains)):
                 return False
         return True
+    
+    def mean(self, column: str) -> float:
+        mean = np.mean(self._dataframe[column])
+        return mean
 
-    def mean(self, column: str, privacy_budget: PrivacyBudget) -> float:
+    def laplace_mean(self, column: str, privacy_budget: PrivacyBudget) -> float:
         """Return a private mean using Laplace mechanism.
 
         args:
@@ -69,7 +73,7 @@ class PrivateTable:
         outputs:
             - the private mean of a column.
         """
-        assert(privacy_budget.delta == 0)
+        # assert(privacy_budget.delta == 0)
         assert column in self._columns, f'Column `{column}`is not exists.'
         assert column in self._data_domains
         domain = self._data_domains[column]

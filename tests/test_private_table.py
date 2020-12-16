@@ -36,16 +36,20 @@ def test_column_names(example_table: DataFrame):
     assert 'Name' in t._columns
 
 
-def test_private_mean(example_private_table: PrivateTable):
-    """check private mean implementation."""
-    noisy_mean = example_private_table.mean('Age', PrivacyBudget(10000.))
-    check_absolute_error(noisy_mean, 33.2, 1.)
+def test_private_laplace_mean(example_private_table: PrivateTable, column: str, privacybudget: PrivacyBudget):
+    """check private laplace mean implementation."""
+    noisy_mean = example_private_table.laplace_mean(column, privacybudget)
+    print("actual mean =",example_private_table.mean(column))
+    print("noisy mean =",noisy_mean)
+    check_absolute_error(noisy_mean, example_private_table.mean(column), 1.)
 
 
-def test_private_gaussian_mean(example_private_table: PrivateTable):
+def test_private_gaussian_mean(example_private_table: PrivateTable, column: str, privacybudget: PrivacyBudget):
     """check private guassian mean implementation."""
-    noisy_mean = example_private_table.gaussian_mean('Age', PrivacyBudget(10000., 0.1))
-    check_absolute_error(noisy_mean, 33.2, 1.)
+    noisy_mean = example_private_table.gaussian_mean(column, privacybudget)
+    print("actual mean =",example_private_table.mean(column))
+    print("noisy mean =",noisy_mean)
+    check_absolute_error(noisy_mean, example_private_table.mean(column), 1.)
 
 
 def test_private_categorical_hist(example_private_table: PrivateTable):

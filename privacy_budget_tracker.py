@@ -30,7 +30,7 @@ class SimplePrivacyBudgetTracker(PrivacyBudgetTracker):
             - privacy_budget: a (epsilon, delta) budget.
         """
         e = self.consumed_privacy_budget + privacy_budget
-        assert e <= self.total_privacy_budget, "there is not enough privacy budget."
+        # assert e <= self.total_privacy_budget, "there is not enough privacy budget."
 
         self.consumed_privacy_budget = self.consumed_privacy_budget + privacy_budget
 
