@@ -11,7 +11,7 @@ from utils import check_positive
 
 def laplace_mechanism(x: Union[float, ndarray], sensitivity: float, privacy_budget: PrivacyBudget) -> Union[float, ndarray]:
     """Differentially private Laplace mechanism. Add Laplacian noise to the value:
-            x + Laplace(loc=0, scale=sensitivity/privacy_buget)
+            x + Laplace(loc=0, scale=sensitivity/privacy_budget)
 
     The result guarantees `privacy_budget`-differential privacy.
 
@@ -74,7 +74,7 @@ def histogram_mechanism(x: ndarray, privacy_budget: PrivacyBudget) -> ndarray:
 
 
 def exponential_mechanism(x: ndarray, score_function: Callable[[ndarray], ndarray], sensitivity: float, privacy_budget: PrivacyBudget) -> Any:
-    """Differentially private exponantial mechanism. Each keys sampling by probability proportional to:
+    """Differentially private exponential mechanism. Each keys sampling by probability proportional to:
             np.exp(epsilon*score/(2*sensitivity))
 
     The result guarantees `privacy_budget`-differential privacy.

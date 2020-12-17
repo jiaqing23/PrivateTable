@@ -1,7 +1,6 @@
 from typing import Dict, List, Union
 
 import numpy as np
-import pandas as pd
 from numpy import ndarray
 from pandas import DataFrame
 
@@ -10,7 +9,6 @@ from privacy_budget import PrivacyBudget
 from privacy_budget_tracker import SimplePrivacyBudgetTracker
 from private_mechanisms import (exponential_mechanism, gaussian_mechanism,
                                 histogram_mechanism, laplace_mechanism)
-from utils import check_positive
 
 
 class PrivateTable:
@@ -67,14 +65,15 @@ class PrivateTable:
         """Return a private mean using Laplace mechanism.
 
         args:
-            - columne: name of the selected column.
+            - column: name of the selected column. assuming each column has the same length
             - privacy: privacy budget.
 
         outputs:
             - the private mean of a column.
         """
-        # assert(privacy_budget.delta == 0)
-        assert column in self._columns, f'Column `{column}`is not exists.'
+
+        assert(privacy_budget.delta == 0)
+        assert column in self._columns, f'Column `{column}` does not exist.'
         assert column in self._data_domains
         domain = self._data_domains[column]
         assert isinstance(domain, RealDataDomain)
@@ -91,13 +90,14 @@ class PrivateTable:
         """Return a private mean using Gaussian mechanism.
 
         args:
-            - columne: name of the selected column.
+            - column: name of the selected column.
             - privacy: privacy budget.
 
         outputs:
             - the private mean of a column.
         """
-        assert column in self._columns, f'Column `{column}`is not exists.'
+
+        assert column in self._columns, f'Column `{column}` does not exist.'
         assert column in self._data_domains
         domain = self._data_domains[column]
         assert isinstance(domain, RealDataDomain)
@@ -111,16 +111,18 @@ class PrivateTable:
         return noisy_mean
 
     def std(self, column: str, privacy_budget: PrivacyBudget) -> float:
-        """Compute the standard deviation.
+        """Compute a private standard deviation using Laplace mechanism.
 
         args:
-            - columne: name of the selected column.
+            - column: name of the selected column.
             - privacy: privacy budget.
 
         outputs:
-            - the private mean of a column.
+            - the private standard deviation of a column.
         """
-        assert column in self._columns, f'Column `{column}`is not exists.'
+
+        assert(privacy_budget.delta == 0)
+        assert column in self._columns, f'Column `{column}` does not exist.'
         assert column in self._data_domains
         domain = self._data_domains[column]
         assert isinstance(domain, RealDataDomain)
@@ -134,17 +136,18 @@ class PrivateTable:
         return noisy_std
 
     def var(self, column: str, privacy_budget: PrivacyBudget) -> float:
-        """Compute the variance.
+        """Compute a private variance using Laplace mechanism.
 
         args:
-            - columne: name of the selected column.
+            - column: name of the selected column.
             - privacy: privacy budget.
 
         outputs:
-            - the private mean of a column.
+            - the private variance of a column.
         """
-        # TODO: Your code here
-        assert column in self._columns, f'Column `{column}`is not exists.'
+
+        assert (privacy_budget.delta == 0)
+        assert column in self._columns, f'Column `{column}` does not exist.'
         assert column in self._data_domains
         domain = self._data_domains[column]
         assert isinstance(domain, RealDataDomain)
@@ -158,65 +161,68 @@ class PrivateTable:
         return noisy_var
 
     def min(self, column: str, privacy_budget: PrivacyBudget) -> float:
-        """Compute the minimum.
+        """Compute a private minimum using Laplace mechanism.
 
         args:
-            - columne: name of the selected column.
+            - column: name of the selected column.
             - privacy: privacy budget.
 
         outputs:
-            - the private mean of a column.
+            - the private min value of a column.
         """
-        # TODO: Your code here
-        assert column in self._columns, f'Column `{column}`is not exists.'
+
+        assert (privacy_budget.delta == 0)
+        assert column in self._columns, f'Column `{column}` does not exist.'
         assert column in self._data_domains
         domain = self._data_domains[column]
         assert isinstance(domain, RealDataDomain)
 
-        minn = np.min(self._dataframe[column])
+        original_min = np.min(self._dataframe[column])
         sensitivity = domain.length()
-        noisy_min = laplace_mechanism(minn, sensitivity, privacy_budget)
+        noisy_min = laplace_mechanism(float(original_min), sensitivity, privacy_budget)
 
         self.privacy_budget_tracker.update_privacy_loss(privacy_budget)
 
         return noisy_min
 
     def max(self, column: str, privacy_budget: PrivacyBudget) -> float:
-        """Compute the maximum.
+        """Compute a private maximum using Laplace mechanism.
 
         args:
-            - columne: name of the selected column.
+            - column: name of the selected column.
             - privacy: privacy budget.
 
         outputs:
-            - the private mean of a column.
+            - the private max value of a column.
         """
-        # TODO: Your code here
-        assert column in self._columns, f'Column `{column}`is not exists.'
+
+        assert (privacy_budget.delta == 0)
+        assert column in self._columns, f'Column `{column}` does not exist.'
         assert column in self._data_domains
         domain = self._data_domains[column]
         assert isinstance(domain, RealDataDomain)
 
-        maxx = np.max(self._dataframe[column])
+        original_max = np.max(self._dataframe[column])
         sensitivity = domain.length()
-        noisy_max = laplace_mechanism(maxx, sensitivity, privacy_budget)
+        noisy_max = laplace_mechanism(float(original_max), sensitivity, privacy_budget)
 
         self.privacy_budget_tracker.update_privacy_loss(privacy_budget)
 
         return noisy_max
 
     def median(self, column: str, privacy_budget: PrivacyBudget) -> float:
-        """Compute the median.
+        """Compute a private median using Laplace mechanism.
 
         args:
-            - columne: name of the selected column.
+            - column: name of the selected column.
             - privacy: privacy budget.
 
         outputs:
-            - the private mean of a column.
+            - the private median of a column.
         """
-        # TODO: Your code here
-        assert column in self._columns, f'Column `{column}`is not exists.'
+
+        assert (privacy_budget.delta == 0)
+        assert column in self._columns, f'Column `{column}` does not exist.'
         assert column in self._data_domains
         domain = self._data_domains[column]
         assert isinstance(domain, RealDataDomain)
@@ -230,16 +236,17 @@ class PrivateTable:
         return noisy_median
 
     def mode(self, column: str, privacy_budget: PrivacyBudget) -> int:
-        """Compute the mode.
+        """Compute a private mode using Exponential mechanism.
 
         args:
-            - columne: name of the selected column.
+            - column: name of the selected column.
             - privacy: privacy budget.
 
         outputs:
-            - the private mean of a column.
+            - the private mode of a column.
         """
-        assert column in self._columns, f'Column `{column}`is not exists.'
+
+        assert column in self._columns, f'Column `{column}` does not exist.'
         assert column in self._data_domains
         domain = self._data_domains[column]
         assert isinstance(domain, CategoricalDataDomain)
@@ -257,16 +264,18 @@ class PrivateTable:
         return noisy_mode
 
     def cat_hist(self, column: str, privacy_budget: PrivacyBudget) -> ndarray:
-        """Compute the histogram for a categorical column.
+        """Compute a private histogram for a categorical column with Laplacian noise.
 
         args:
-            - columne: name of the selected column.
+            - column: name of the selected column.
             - privacy: privacy budget.
 
         outputs:
-            - the private mean of a column.
+            - the private histogram of a categorical column.
         """
-        assert column in self._columns, f'Column `{column}`is not exists.'
+
+        assert (privacy_budget.delta == 0)
+        assert column in self._columns, f'Column `{column}` does not exist.'
         assert column in self._data_domains
         domain = self._data_domains[column]
         assert isinstance(domain, CategoricalDataDomain)
@@ -278,22 +287,24 @@ class PrivateTable:
         return noisy_hist
 
     def num_hist(self, column: str, bins: Union[ndarray, List[float]], privacy_budget: PrivacyBudget) -> ndarray:
-        """Compute the histogram for a categorical column.
+        """Compute the histogram for a numerical column with Laplacian noise.
 
         args:
-            - columne: name of the selected column.
+            - column: name of the selected column.
             - bins: bins of histogram
             - privacy: privacy budget.
 
         outputs:
             - the private mean of a column.
         """
-        assert column in self._columns, f'Column `{column}`is not exists.'
+
+        assert (privacy_budget.delta == 0)
+        assert column in self._columns, f'Column `{column}` does not exist.'
         assert column in self._data_domains
         domain = self._data_domains[column]
         assert isinstance(domain, RealDataDomain)
 
-        hist, binedge = np.histogram(self._dataframe[column], bins=bins)
+        hist, bin_edge = np.histogram(self._dataframe[column], bins=bins)
         noisy_hist = histogram_mechanism(hist, privacy_budget)
 
         self.privacy_budget_tracker.update_privacy_loss(privacy_budget)
