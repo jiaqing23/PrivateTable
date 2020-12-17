@@ -1,1 +1,5 @@
 .mypy_cache
+.idea/
+.vscode/
+tests/__pychache__/
+__pychache__/
