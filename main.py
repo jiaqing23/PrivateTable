@@ -19,7 +19,7 @@ if __name__ == '__main__':
     os.system('pytest -s .')
 
     # clean up
-    #os.system('py3clean .')
-    os.system('rm -r .pytest_cache')
+    # os.system('py3clean .')
+    # os.system('rm -r .pytest_cache')
     # For Windows use below
     os.system('pyclean .')

@@ -26,7 +26,7 @@ def laplace_mechanism(x: Union[float, ndarray], sensitivity: float, privacy_budg
     check_positive(privacy_budget.epsilon)
     check_positive(sensitivity)
 
-    shape = (1, ) if isinstance(x, float) else x.shape
+    shape = (1, ) if isinstance(x, (int, float)) else x.shape
     noise = laplace(loc=0., scale=sensitivity / privacy_budget.epsilon, size=shape)
     return x + noise
 
@@ -49,7 +49,7 @@ def gaussian_mechanism(x: Union[float, ndarray], sensitivity: float, privacy_bud
     check_positive(privacy_budget.delta)
     check_positive(sensitivity)
 
-    shape = (1, ) if isinstance(x, float) else x.shape
+    shape = (1, ) if isinstance(x, (int, float)) else x.shape
     noise = normal(loc=0.,
                    scale=np.sqrt(2 * np.log(1.25/privacy_budget.delta) * sensitivity**2 / privacy_budget.epsilon**2),
                    size=shape)
