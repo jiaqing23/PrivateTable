@@ -23,7 +23,7 @@ class PrivateTable:
 
     """
 
-    def __init__(self, dataframe: DataFrame, data_domains: Dict[str, DataDomain], total_privacy_budget: PrivacyBudget, option="Simple", delta_prime=0.5):
+    def __init__(self, dataframe: DataFrame, data_domains: Dict[str, DataDomain], total_privacy_budget: PrivacyBudget, delta_prime=0.5):
         """Create a private data table.
 
         args:

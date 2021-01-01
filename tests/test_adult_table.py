@@ -1,3 +1,4 @@
+import os
 from typing import List
 
 import numpy as np
@@ -14,7 +15,7 @@ from utils import check_absolute_error
 @pytest.fixture
 def example_table():
     """creating a table from the Age and Education columns of the adult dataset"""
-    adult_data = pd.read_csv("adult.data.txt",
+    adult_data = pd.read_csv(os.path.join("dataset", "adult_data.txt"),
                              names=["Age", "Workclass", "fnlwgt", "Education", "Education-Num", "Martial Status",
                                     "Occupation", "Relationship", "Race", "Sex", "Capital Gain", "Capital Loss",
                                     "Hours per week", "Country", "Target"])
@@ -23,9 +24,9 @@ def example_table():
     return df
 
 
-@pytest.fixture
+@ pytest.fixture
 def example_private_table():
-    adult_data = pd.read_csv("adult.data.txt",
+    adult_data = pd.read_csv(os.path.join("dataset", "adult_data.txt"),
                              names=["Age", "Workclass", "fnlwgt", "Education", "Education-Num", "Martial Status",
                                     "Occupation", "Relationship", "Race", "Sex", "Capital Gain", "Capital Loss",
                                     "Hours per week", "Country", "Target"])
@@ -35,7 +36,7 @@ def example_private_table():
                'Education': CategoricalDataDomain([' Bachelors', ' HS-grad', ' 11th', ' Masters',
                                                    ' 9th', ' Some-college', ' Assoc-acdm', ' Assoc-voc', ' 7th-8th', ' Doctorate',
                                                    ' Prof-school', ' 5th-6th', ' 10th', ' 1st-4th', ' Preschool', ' 12th'])}
-    return PrivateTable(df, domains, PrivacyBudget(100000.0, 1.), option="Advance")
+    return PrivateTable(df, domains, PrivacyBudget(100000.0, 1.))
 
 
 def test_column_names(example_table: DataFrame):
@@ -64,7 +65,7 @@ def test_private_gaussian_mean(example_private_table: PrivateTable):
 def test_private_categorical_hist(example_private_table: PrivateTable):
     """check private hist implementation for categorical column of Education in adult dataset.
     bins:       HS-grad, Bachelors etc
-    
+
     """
     noisy_hist = example_private_table.cat_hist('Education', PrivacyBudget(10000.))
 
@@ -80,7 +81,7 @@ def test_private_numerical_hist(example_private_table: PrivateTable):
     bins:         17, 18, 19 ... 90
 
     """
-    bins: List[float] = [int(i) for i in range(17, 91)] 
+    bins: List[float] = [int(i) for i in range(17, 91)]
     noisy_hist = example_private_table.num_hist('Age', bins, PrivacyBudget(10000.))
     err = [int(1) for i in range(1, 74)]
     noisy_hist.sort()
