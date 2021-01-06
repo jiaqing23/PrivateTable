@@ -9,7 +9,7 @@ from privacy_budget_tracker import SimplePrivacyBudgetTracker
 from utils import check_positive
 
 
-def laplace_mechanism(x: Union[float, ndarray], sensitivity: float, privacy_budget: PrivacyBudget) -> Union[float, ndarray]:
+def laplace_mechanism(x: Union[int, float, ndarray], sensitivity: float, privacy_budget: PrivacyBudget) -> Union[float, ndarray]:
     """Differentially private Laplace mechanism. Add Laplacian noise to the value:
             x + Laplace(loc=0, scale=sensitivity/privacy_buget)
 
@@ -31,7 +31,7 @@ def laplace_mechanism(x: Union[float, ndarray], sensitivity: float, privacy_budg
     return x + noise
 
 
-def gaussian_mechanism(x: Union[float, ndarray], sensitivity: float, privacy_budget: PrivacyBudget) -> Union[float, ndarray]:
+def gaussian_mechanism(x: Union[int, float, ndarray], sensitivity: float, privacy_budget: PrivacyBudget) -> Union[float, ndarray]:
     """Differentially private Gaussian mechanism. Add Gaussian noise to the value:
             x + Normal(loc=0, scale=np.sqrt(2*np.log(1.25/delta)*sensitivity**2/epsilon**2)
 
