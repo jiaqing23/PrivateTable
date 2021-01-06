@@ -64,7 +64,7 @@ def test_private_gaussian_mean(example_private_table: PrivateTable):
 def test_private_categorical_hist(example_private_table: PrivateTable):
     """check private hist implementation for categorical column of Education in adult dataset.
     bins:       HS-grad, Bachelors etc
-    
+
     """
     noisy_hist = example_private_table.cat_hist('Education', PrivacyBudget(10000.))
 
@@ -80,7 +80,7 @@ def test_private_numerical_hist(example_private_table: PrivateTable):
     bins:         17, 18, 19 ... 90
 
     """
-    bins: List[float] = [int(i) for i in range(17, 91)] 
+    bins: List[float] = [int(i) for i in range(17, 91)]
     noisy_hist = example_private_table.num_hist('Age', bins, PrivacyBudget(10000.))
     err = [int(1) for i in range(1, 74)]
     noisy_hist.sort()
