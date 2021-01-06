@@ -19,17 +19,22 @@ class PrivateTable:
     Differentially private mechanisms for a data table.
 
     Supported statistical functions:
-        - mean: the private mean.
-
+    
+    - mean
+    - std
+    - var
+    - min
+    - max
+    - median
+    - mode
+    - histogram
     """
 
     def __init__(self, dataframe: DataFrame, data_domains: Dict[str, DataDomain], total_privacy_budget: PrivacyBudget, delta_prime=0.5):
-        """Create a private data table.
-
-        args:
-            - dataframe (DataFrame): the data source (expected a pandas dataframe).
-            - data_domains (Dict[str, DataDomain]): specify the set of all posible value for each data column. It is a map from `column_name` to a `data_domain`.
-            - total_privacy_budget (float): the total privacy privacy that can be consumed by the private table. When is there is no privacy budget left, stop answering queries.
+        """
+        :param dataframe: The data source 
+        :param data_domains: Specify the set of all posible value for each data column. It is a map from `column_name` to a `data_domain`.
+        :param total_privacy_budget: The total privacy budget that can be consumed by the private table. When is there is no privacy budget left, stop answering queries.
         """
         super().__init__()
         self._dataframe = dataframe
@@ -45,14 +50,11 @@ class PrivateTable:
                 f'  Privacy budget : {self.privacy_budget_tracker.total_privacy_budget},\n'
                 f'  Privacy loss   : {self.privacy_budget_tracker.consumed_privacy_budget}\n)')
 
-    def check_data_domains(self, domains: Dict[str, DataDomain]):
+    def check_data_domains(self, domains: Dict[str, DataDomain]) -> bool:
         """Check if data in private columns are belong to the data domain `domains`.
 
-        args:
-            - domains (dict[str, DataDomain]): data domain specifications.
-
-        outputs:
-            - whether values in the private table belonging to the `domains`.
+        :param domains: Data domain specifications
+        :return: `True` if data in the private table belonging to the `domains`, `False` otherwise
         """
         for col in self._columns:
             if not np.all(self._dataframe[col].apply(domains[col].contains)):
@@ -62,12 +64,10 @@ class PrivateTable:
     def mean(self, column: str, privacy_budget: PrivacyBudget) -> float:
         """Return a private mean using Laplace mechanism.
 
-        args:
-            - columne: name of the selected column.
-            - privacy: privacy budget.
+        :param column: Name of the selected column
+        :param privacy_budget: Privacy budget to be used
 
-        outputs:
-            - the private mean of a column.
+        :return: Private mean of the selected column
         """
         assert(privacy_budget.delta == 0)
         assert column in self._columns, f'Column `{column}`is not exists.'
@@ -86,12 +86,10 @@ class PrivateTable:
     def gaussian_mean(self, column: str, privacy_budget: PrivacyBudget) -> float:
         """Return a private mean using Gaussian mechanism.
 
-        args:
-            - columne: name of the selected column.
-            - privacy: privacy budget.
+        :param column: Name of the selected column
+        :param privacy_budget: Privacy budget to be used
 
-        outputs:
-            - the private mean of a column.
+        :return: Private mean of the selected column
         """
         assert column in self._columns, f'Column `{column}`is not exists.'
         assert column in self._data_domains
@@ -109,12 +107,10 @@ class PrivateTable:
     def std(self, column: str, privacy_budget: PrivacyBudget) -> float:
         """Compute the standard deviation.
 
-        args:
-            - columne: name of the selected column.
-            - privacy: privacy budget.
+        :param column: Name of the selected column
+        :param privacy_budget: Privacy budget to be used
 
-        outputs:
-            - the private mean of a column.
+        :return: Private standard deviation of the selected column
         """
         assert column in self._columns, f'Column `{column}`is not exists.'
         assert column in self._data_domains
@@ -132,14 +128,11 @@ class PrivateTable:
     def var(self, column: str, privacy_budget: PrivacyBudget) -> float:
         """Compute the variance.
 
-        args:
-            - columne: name of the selected column.
-            - privacy: privacy budget.
+        :param column: Name of the selected column
+        :param privacy_budget: Privacy budget to be used
 
-        outputs:
-            - the private mean of a column.
+        :return: Private variance of the selected column
         """
-        # TODO: Your code here
         assert column in self._columns, f'Column `{column}`is not exists.'
         assert column in self._data_domains
         domain = self._data_domains[column]
@@ -156,12 +149,10 @@ class PrivateTable:
     def min(self, column: str, privacy_budget: PrivacyBudget) -> float:
         """Compute the minimum.
 
-        args:
-            - columne: name of the selected column.
-            - privacy: privacy budget.
+        :param column: Name of the selected column
+        :param privacy_budget: Privacy budget to be used
 
-        outputs:
-            - the private mean of a column.
+        :return: Private minimum of the selected column
         """
         # TODO: Your code here
         assert column in self._columns, f'Column `{column}`is not exists.'
@@ -180,12 +171,10 @@ class PrivateTable:
     def max(self, column: str, privacy_budget: PrivacyBudget) -> float:
         """Compute the maximum.
 
-        args:
-            - columne: name of the selected column.
-            - privacy: privacy budget.
+        :param column: Name of the selected column
+        :param privacy_budget: Privacy budget to be used
 
-        outputs:
-            - the private mean of a column.
+        :return: Private maximum of the selected column
         """
         # TODO: Your code here
         assert column in self._columns, f'Column `{column}`is not exists.'
@@ -204,12 +193,10 @@ class PrivateTable:
     def median(self, column: str, privacy_budget: PrivacyBudget) -> float:
         """Compute the median.
 
-        args:
-            - columne: name of the selected column.
-            - privacy: privacy budget.
+        :param column: Name of the selected column
+        :param privacy_budget: Privacy budget to be used
 
-        outputs:
-            - the private mean of a column.
+        :return: Private median of the selected column
         """
         # TODO: Your code here
         assert column in self._columns, f'Column `{column}`is not exists.'
@@ -228,12 +215,10 @@ class PrivateTable:
     def mode(self, column: str, privacy_budget: PrivacyBudget) -> int:
         """Compute the mode.
 
-        args:
-            - columne: name of the selected column.
-            - privacy: privacy budget.
+        :param column: Name of the selected column
+        :param privacy_budget: Privacy budget to be used
 
-        outputs:
-            - the private mean of a column.
+        :return: Private mode of the selected column
         """
         assert column in self._columns, f'Column `{column}`is not exists.'
         assert column in self._data_domains
@@ -255,12 +240,10 @@ class PrivateTable:
     def cat_hist(self, column: str, privacy_budget: PrivacyBudget) -> ndarray:
         """Compute the histogram for a categorical column.
 
-        args:
-            - columne: name of the selected column.
-            - privacy: privacy budget.
+        :param column: Name of the selected column
+        :param privacy_budget: Privacy budget to be used
 
-        outputs:
-            - the private mean of a column.
+        :return: Private histogram of the selected column
         """
         assert column in self._columns, f'Column `{column}`is not exists.'
         assert column in self._data_domains
@@ -275,14 +258,12 @@ class PrivateTable:
 
     def num_hist(self, column: str, bins: Union[ndarray, List[float]], privacy_budget: PrivacyBudget) -> ndarray:
         """Compute the histogram for a categorical column.
+        
+        :param column: Name of the selected column
+        :param bins: Bins of histogram
+        :param privacy_budget: Privacy budget to be used
 
-        args:
-            - columne: name of the selected column.
-            - bins: bins of histogram
-            - privacy: privacy budget.
-
-        outputs:
-            - the private mean of a column.
+        :return: Private histogram of the selected column
         """
         assert column in self._columns, f'Column `{column}`is not exists.'
         assert column in self._data_domains
