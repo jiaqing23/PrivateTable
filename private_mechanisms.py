@@ -56,7 +56,7 @@ def gaussian_mechanism(x: Union[int, float, ndarray], sensitivity: float, privac
 
 def histogram_mechanism(x: ndarray, privacy_budget: PrivacyBudget) -> ndarray:
     """Differentially private histogram mechanism. Add Laplacian noise to the value:
-    
+
     .. math::
             x + Laplace\left(\mu=0, \sigma=\\frac{\Delta f}{\epsilon}\\right)
 
