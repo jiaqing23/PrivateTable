@@ -25,7 +25,7 @@ def example_private_table():
     df = pd.DataFrame(data)
     domains = {'Name': CategoricalDataDomain(['Tom', 'Jack', 'Steve', 'Eve', 'Adam', 'Lucifer']),
                'Age': RealDataDomain(0., 130.)}
-    return PrivateTable(df, domains, PrivacyBudget(100000.0, 1.), option="Advance")
+    return PrivateTable(df, domains, PrivacyBudget(100000.0, 1.))
 
 
 def test_column_names(example_table: DataFrame):

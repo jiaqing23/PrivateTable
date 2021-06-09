@@ -19,7 +19,7 @@ class PrivateTable:
     Differentially private mechanisms for a data table.
 
     Supported statistical functions:
-    
+
     - mean
     - std
     - var
@@ -258,7 +258,7 @@ class PrivateTable:
 
     def num_hist(self, column: str, bins: Union[ndarray, List[float]], privacy_budget: PrivacyBudget) -> ndarray:
         """Compute the histogram for a categorical column.
-        
+
         :param column: Name of the selected column
         :param bins: Bins of histogram
         :param privacy_budget: Privacy budget to be used

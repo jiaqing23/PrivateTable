@@ -14,6 +14,7 @@ import calculate_moment
 class PrivacyBudgetTracker(ABC):
     """Base class of privacy budget tracker.
     """
+
     def __init__(self, total_privacy_budget: PrivacyBudget):
         """
         :param total_privacy_budget: The total privacy budget that can be consumed by the private table. 
@@ -26,6 +27,7 @@ class PrivacyBudgetTracker(ABC):
 class SimplePrivacyBudgetTracker(PrivacyBudgetTracker):
     """Privacy budget tracker that use simple composition theorem to update consumed privacy budget.
     """
+
     def update_privacy_loss(self, privacy_budget: PrivacyBudget):
         """Update the consumed privacy budget using a simple privacy composition theorem. 
         Also check if the remain privacy budget is enough for the current query.
