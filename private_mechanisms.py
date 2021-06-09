@@ -46,6 +46,7 @@ def gaussian_mechanism(x: Union[int, float, ndarray], sensitivity: float, privac
     check_positive(privacy_budget.epsilon)
     check_positive(privacy_budget.delta)
     check_positive(sensitivity)
+    assert(privacy_budget.epsilon < 1)
 
     shape = (1, ) if isinstance(x, (int, float)) else x.shape
     noise = normal(loc=0.,
