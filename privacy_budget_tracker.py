@@ -9,7 +9,7 @@ import numpy as np
 
 from privacy_budget import PrivacyBudget
 
-import calculate_moment
+from calculate_moment import *
 
 class PrivacyBudgetTracker(ABC):
     """Base class of privacy budget tracker.
@@ -50,7 +50,7 @@ class AdvancedPrivacyBudgetTracker(PrivacyBudgetTracker):
         :param k: Number of query, defaults to 1
         """
 
-        assert(target_delta > 0, "Value of delta should be positive")
+        assert target_delta > 0, "Value of delta should be positive"
 
         kfold_privacy_budget = PrivacyBudget(np.sqrt(2*k*np.log(1/target_delta))*privacy_budget.epsilon
                                              + k*privacy_budget.epsilon*(np.exp(privacy_budget.epsilon)-1),
@@ -82,11 +82,11 @@ class MomentPrivacyBudgetTracker(PrivacyBudgetTracker):
         :param target_eps: Target value of :math:`\epsilon`, defaults to None
         :param target_delta: Target value of :math:`\delta`, defaults to None
         """
-        assert(target_eps > 0, "Value of epsilon should be positive")
-        assert(target_delta > 0, "Value of delta should be positive")
+        assert (target_eps is None) or (target_eps > 0), "Value of epsilon should be positive"
+        assert (target_delta is None) or (target_delta > 0), "Value of delta should be positive"
 
-        log_moments = [(i, compute_log_moment(q, sigma, steps, i)) for i in range(1, moment_order + 1)]
-        privacy = get_privacy_spent(moment_order, target_eps, target_delta)
+        log_moments = [(i, compute_log_moment(sampling_ratio, sigma, steps, i)) for i in range(1, moment_order + 1)]
+        privacy = get_privacy_spent(log_moments, target_eps, target_delta)
         privacy_budget = PrivacyBudget(privacy[0], privacy[1])
 
         e = self.consumed_privacy_budget + privacy_budget
