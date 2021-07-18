@@ -75,7 +75,7 @@ def exponential_mechanism(x: ndarray, score_function: Callable[[ndarray], ndarra
     """Differentially private exponantial mechanism. Each keys sampling by probability proportional to:
 
     .. math::
-        \exp\left(\\frac{\epsilon \\times score}{2 \Delta f}\\right)
+        \exp \left (\\frac{\epsilon \\times score}{2 \Delta f}\\right)
 
     The result guarantees :math:`(\epsilon,\delta)`-differential privacy.
 

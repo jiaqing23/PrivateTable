@@ -1,24 +1,26 @@
-from typing import Callable, Any, Union
+import random
+from datetime import datetime
+from typing import Any, Callable, Union
 
 import numpy as np
 from numpy import array
 from numpy.random import normal
-import random
-from datetime import datetime
+
 from privacy_budget import PrivacyBudget
 from privacy_budget_tracker import MomentPrivacyBudgetTracker
 
-def private_SGD(gradient_function: Callable[[], Any], 
-                get_weights_function: Callable[[], None], 
-                update_weights_function: Callable[[Any], None], 
-                learning_rate_function: Callable[[int], float], 
-                train_data: array, 
-                group_size: int, 
-                gradient_norm_bound: Union[int, float], 
-                number_of_steps: int, 
-                sigma: Union[int, float], 
+
+def private_SGD(gradient_function: Callable[[array], Any],
+                get_weights_function: Callable[[], array],
+                update_weights_function: Callable[[Any], None],
+                learning_rate_function: Callable[[int], float],
+                train_data: array,
+                group_size: int,
+                gradient_norm_bound: Union[int, float],
+                number_of_steps: int,
+                sigma: Union[int, float],
                 moment_privacy_budget_tracker: MomentPrivacyBudgetTracker,
-                test_interval: int = None, 
+                test_interval: int = None,
                 test_function: Callable[[], None] = None
                 ):
     """This Differencial Privacy(DP) SGD proposed in https://arxiv.org/pdf/1607.00133.pdf. 
@@ -41,40 +43,40 @@ def private_SGD(gradient_function: Callable[[], Any],
     def gaussian_noise(x, standard_deviation):
         shape = (1, ) if isinstance(x, (int, float)) else x.shape
         noise = normal(loc=0.,
-                    scale=standard_deviation,
-                    size=shape)
+                       scale=standard_deviation,
+                       size=shape)
         return x + noise
-    
+
     random.seed(datetime.now())
     idx = list(range(len(train_data)))
     random.shuffle(idx)
     train_data = train_data[idx]
     number_of_group = len(train_data)//group_size
-    
+
     for step in range(number_of_steps):
         group_id = int(random.random()*number_of_group)
         train_data_group = train_data[group_size*group_id: group_size*(group_id+1)]
-        total_grad = None
+        total_grad = np.array([])
         total_loss = 0
-        
+
         for i in range(len(train_data_group)):
             grad = np.array(gradient_function(train_data_group[i]), dtype=object)
             grad /= max(1, np.linalg.norm(np.hstack([np.array(i).flatten() for i in grad]))/gradient_norm_bound)
             total_grad = (total_grad + grad) if i > 0 else grad
-        
+
         total_grad = np.array([gaussian_noise(i, sigma*gradient_norm_bound) for i in total_grad], dtype=object)
         total_grad /= len(train_data_group)
-        
+
         weights = get_weights_function()
         for i in range(len(weights)):
             weights[i] -= learning_rate_function(step+1) * total_grad[i]
         update_weights_function(weights)
-        
-        if test_function and test_interval and step%test_interval==0:
+
+        if test_function and test_interval and step % test_interval == 0:
             test_function()
 
-    moment_privacy_budget_tracker.update_privacy_loss(sampling_ratio =group_size/len(train_data), 
-                                                        sigma = sigma, 
-                                                        steps = number_of_steps, 
-                                                        moment_order = 32 , 
-                                                        target_delta = 0.5/len(train_data))
+    moment_privacy_budget_tracker.update_privacy_loss(sampling_ratio=group_size/len(train_data),
+                                                      sigma=sigma,
+                                                      steps=number_of_steps,
+                                                      moment_order=32,
+                                                      target_delta=0.5/len(train_data))

@@ -87,25 +87,25 @@ def test_private_mean_petal_width(example_private_table: PrivateTable):
 
 def test_private_gaussian_mean_sepal_length(example_private_table: PrivateTable):
     """check private gaussian mean implementation using Sepal Length in iris dataset."""
-    noisy_mean = example_private_table.gaussian_mean('Sepal Length', PrivacyBudget(10000., 0.1))
+    noisy_mean = example_private_table.gaussian_mean('Sepal Length', PrivacyBudget(0.99, 0.5))
     check_absolute_error(noisy_mean, 5.843333333333335, 1.)
 
 
 def test_private_gaussian_mean_sepal_width(example_private_table: PrivateTable):
     """check private gaussian mean implementation using Sepal Width in iris dataset."""
-    noisy_mean = example_private_table.gaussian_mean('Sepal Width', PrivacyBudget(10000., 0.1))
+    noisy_mean = example_private_table.gaussian_mean('Sepal Width', PrivacyBudget(0.99, 0.5))
     check_absolute_error(noisy_mean, 3.0540000000000007, 1.)
 
 
 def test_private_gaussian_mean_petal_length(example_private_table: PrivateTable):
     """check private gaussian mean implementation using Petal Length in iris dataset."""
-    noisy_mean = example_private_table.gaussian_mean('Petal Length', PrivacyBudget(10000., 0.1))
+    noisy_mean = example_private_table.gaussian_mean('Petal Length', PrivacyBudget(0.99, 0.5))
     check_absolute_error(noisy_mean, 3.7586666666666693, 1.)
 
 
 def test_private_gaussian_mean_petal_width(example_private_table: PrivateTable):
     """check private gaussian mean implementation using Petal Width in iris dataset."""
-    noisy_mean = example_private_table.gaussian_mean('Petal Width', PrivacyBudget(10000., 0.1))
+    noisy_mean = example_private_table.gaussian_mean('Petal Width', PrivacyBudget(0.99, 0.5))
     check_absolute_error(noisy_mean, 1.1986666666666672, 1.)
 
 

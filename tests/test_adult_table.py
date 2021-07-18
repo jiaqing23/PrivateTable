@@ -58,7 +58,7 @@ def test_private_mean(example_private_table: PrivateTable):
 
 def test_private_gaussian_mean(example_private_table: PrivateTable):
     """check private guassian mean implementation using Age in adult dataset."""
-    noisy_mean = example_private_table.gaussian_mean('Age', PrivacyBudget(10000., 0.1))
+    noisy_mean = example_private_table.gaussian_mean('Age', PrivacyBudget(0.99, 0.5))
     check_absolute_error(noisy_mean, 38.58164675532078, 1.)
 
 

@@ -25,7 +25,7 @@ def example_private_table():
     df = pd.DataFrame(data)
     domains = {'Name': CategoricalDataDomain(['Tom', 'Jack', 'Steve', 'Eve', 'Adam', 'Lucifer']),
                'Age': RealDataDomain(0., 130.)}
-    return PrivateTable(df, domains, PrivacyBudget(100000.0, 1.))
+    return PrivateTable(df, domains, PrivacyBudget(100000.0, 1000.))
 
 
 def test_column_names(example_table: DataFrame):
@@ -44,8 +44,8 @@ def test_private_mean(example_private_table: PrivateTable):
 
 def test_private_gaussian_mean(example_private_table: PrivateTable):
     """check private guassian mean implementation."""
-    noisy_mean = example_private_table.gaussian_mean('Age', PrivacyBudget(10000., 0.1))
-    check_absolute_error(noisy_mean, 33.2, 1.)
+    noisy_mean = np.mean([example_private_table.gaussian_mean('Age', PrivacyBudget(0.99, 0.5)) for i in range(100)])
+    check_absolute_error(noisy_mean, 33.2, 10.)
 
 
 def test_private_categorical_hist(example_private_table: PrivateTable):
