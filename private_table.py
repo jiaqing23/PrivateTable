@@ -154,7 +154,6 @@ class PrivateTable:
 
         :return: Private minimum of the selected column
         """
-        # TODO: Your code here
         assert column in self._columns, f'Column `{column}`is not exists.'
         assert column in self._data_domains
         domain = self._data_domains[column]
@@ -176,7 +175,6 @@ class PrivateTable:
 
         :return: Private maximum of the selected column
         """
-        # TODO: Your code here
         assert column in self._columns, f'Column `{column}`is not exists.'
         assert column in self._data_domains
         domain = self._data_domains[column]
@@ -198,7 +196,6 @@ class PrivateTable:
 
         :return: Private median of the selected column
         """
-        # TODO: Your code here
         assert column in self._columns, f'Column `{column}`is not exists.'
         assert column in self._data_domains
         domain = self._data_domains[column]
@@ -230,7 +227,7 @@ class PrivateTable:
             s = [np.sum(x == label) for label in R]
             return R, s
 
-        sensitivity = 2
+        sensitivity = 1
         noisy_mode = exponential_mechanism(self._dataframe[column], score_function, sensitivity, privacy_budget)
 
         self.privacy_budget_tracker.update_privacy_loss(privacy_budget)

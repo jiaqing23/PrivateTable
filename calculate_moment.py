@@ -1,4 +1,4 @@
-# Origin: https://github.com/marcotcr/tf-models/blob/master/differential_privacy/privacy_accountant/python/gaussian_moments.py
+# Source: https://github.com/marcotcr/tf-models/blob/master/differential_privacy/privacy_accountant/python/gaussian_moments.py
 
 # Copyright 2016 The TensorFlow Authors. All Rights Reserved.
 #

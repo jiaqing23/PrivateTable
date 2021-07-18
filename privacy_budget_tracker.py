@@ -3,7 +3,7 @@ PrivacyBudgetTracker classes.
 """
 
 from abc import ABC
-from typing import List
+from typing import List, Union
 
 import numpy as np
 
@@ -43,38 +43,31 @@ class SimplePrivacyBudgetTracker(PrivacyBudgetTracker):
 class AdvancedPrivacyBudgetTracker(PrivacyBudgetTracker):
     """Privacy budget tracker that use advance composition theorem to update consumed privacy budget.
     """
-    def update_privacy_loss(self, privacy_budget: PrivacyBudget, target_delta: float, k: int = 1):
+    def update_privacy_loss(self, privacy_budget: PrivacyBudget, delta_prime: float, k: int = 1):
         """Calculate and update privacy loss of multiple query with same privacy_budget.
         :param privacy_budget: Privacy budget of query
-        :param target_delta: Target value of :math:`\epsilon`
+        :param delta_prime: Value of :math:`\epsilon'`
         :param k: Number of query, defaults to 1
         """
 
-        assert target_delta > 0, "Value of delta should be positive"
+        assert delta_prime > 0, "Value of delta should be positive"
 
-        kfold_privacy_budget = PrivacyBudget(np.sqrt(2*k*np.log(1/target_delta))*privacy_budget.epsilon
+        kfold_privacy_budget = PrivacyBudget(np.sqrt(2*k*np.log(1/delta_prime))*privacy_budget.epsilon
                                              + k*privacy_budget.epsilon*(np.exp(privacy_budget.epsilon)-1),
-                                             k*privacy_budget.delta + target_delta)
+                                             k*privacy_budget.delta + delta_prime)
         
         e = self.consumed_privacy_budget + kfold_privacy_budget
         assert e <= self.total_privacy_budget, "there is not enough privacy budget."
 
         self.consumed_privacy_budget = e
 
-# consumed = (0, 0)
-# User 1st time query with epislon = 5, kfold_privacy_budget(k=1) = (1, 0.5)
-# dict = {5:1, 7:2, 3:1}
-# consumed += (1, 0.5)
-# 2nd time, kfold_privacy_budget(k=2) = (1.5,0.6)
-# consumed += (1.5,0.6)-(1, 0.5)
-# Context manager # Use max value of epsilon
-# 2 query with epsilon = 5
-
 class MomentPrivacyBudgetTracker(PrivacyBudgetTracker):
     """Privacy budget tracker that use moment accountant (https://arxiv.org/pdf/1607.00133.pdf) to update consumed privacy budget.
     """
-    def update_privacy_loss(self, sampling_ratio, sigma, steps, moment_order = 32, target_eps = None, target_delta = None):
+    def update_privacy_loss(self, sampling_ratio: float, sigma: float, steps: int, moment_order: int = 32, 
+                            target_eps: Union[float,None] = None, target_delta: Union[float,None] = None):
         """Calculate and update privacy loss. Must specify exactly either one of `target_eps` or `target_delta`.
+
         :param sampling_ratio: Ratio of data used to total data in one step
         :param sigma: Noise scale
         :param steps: Number of update performed
