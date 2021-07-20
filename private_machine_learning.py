@@ -3,18 +3,18 @@ from datetime import datetime
 from typing import Any, Callable, Union
 
 import numpy as np
-from numpy import array
+from numpy import ndarray
 from numpy.random import normal
 
 from privacy_budget import PrivacyBudget
 from privacy_budget_tracker import MomentPrivacyBudgetTracker
 
 
-def private_SGD(gradient_function: Callable[[array], Any],
-                get_weights_function: Callable[[], array],
+def private_SGD(gradient_function: Callable[[Any], Union[int, float, list, ndarray]],
+                get_weights_function: Callable[[], Union[int, float, list, ndarray]],
                 update_weights_function: Callable[[Any], None],
                 learning_rate_function: Callable[[int], float],
-                train_data: array,
+                train_data: Union[list, ndarray],
                 group_size: int,
                 gradient_norm_bound: Union[int, float],
                 number_of_steps: int,
@@ -41,7 +41,7 @@ def private_SGD(gradient_function: Callable[[array], Any],
     """
 
     def gaussian_noise(x, standard_deviation):
-        shape = (1, ) if isinstance(x, (int, float)) else x.shape
+        shape = None if isinstance(x, (int, float)) else x.shape
         noise = normal(loc=0.,
                        scale=standard_deviation,
                        size=shape)
@@ -50,7 +50,7 @@ def private_SGD(gradient_function: Callable[[array], Any],
     random.seed(datetime.now())
     idx = list(range(len(train_data)))
     random.shuffle(idx)
-    train_data = train_data[idx]
+    train_data = np.array(train_data)[idx]
     number_of_group = len(train_data)//group_size
 
     for step in range(number_of_steps):
@@ -60,19 +60,32 @@ def private_SGD(gradient_function: Callable[[array], Any],
         total_loss = 0
 
         for i in range(len(train_data_group)):
-            grad = np.array(gradient_function(train_data_group[i]), dtype=object)
-            grad /= max(1, np.linalg.norm(np.hstack([np.array(i).flatten() for i in grad]))/gradient_norm_bound)
+            grad = gradient_function(train_data_group[i])
+            if isinstance(grad, int) or isinstance(grad, float):
+                grad /= max(1, grad**2/gradient_norm_bound)
+            elif isinstance(grad, list) or isinstance(grad, ndarray):  # Either list/array or list/array of list/array
+                grad = np.array(grad, dtype=object)
+                grad /= max(1, np.linalg.norm(np.hstack([np.array(i).flatten() for i in grad]))/gradient_norm_bound)
+            else:
+                raise(TypeError("Data type returned by gradient_function should be either int, float, list or numpy ndarray"))
             total_grad = (total_grad + grad) if i > 0 else grad
 
-        total_grad = np.array([gaussian_noise(i, sigma*gradient_norm_bound) for i in total_grad], dtype=object)
+        if isinstance(total_grad, int) or isinstance(total_grad, float):
+            total_grad = gaussian_noise(grad, sigma*gradient_norm_bound)
+        elif isinstance(total_grad, ndarray):
+            total_grad = np.array([gaussian_noise(i, sigma*gradient_norm_bound) for i in total_grad], dtype=object)
+        else:
+            raise(TypeError)
         total_grad /= len(train_data_group)
 
         weights = get_weights_function()
-        for i in range(len(weights)):
-            weights[i] -= learning_rate_function(step+1) * total_grad[i]
+        lr = learning_rate_function(step+1)
+        if isinstance(total_grad, ndarray):
+            weights = np.array(weights)
+        weights = weights - lr * total_grad
         update_weights_function(weights)
 
-        if test_function and test_interval and step % test_interval == 0:
+        if test_function and test_interval and (step+1) % test_interval == 0:
             test_function()
 
     moment_privacy_budget_tracker.update_privacy_loss(sampling_ratio=group_size/len(train_data),

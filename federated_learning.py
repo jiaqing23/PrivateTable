@@ -6,7 +6,7 @@ from typing import Any, Callable, Iterable, List, Tuple, Union
 
 import numpy as np
 import tensorflow as tf
-from numpy import array, ndarray
+from numpy import ndarray
 from numpy.random import normal
 from tensorflow.keras import Model, losses
 
@@ -16,7 +16,7 @@ class FedAvgClient:
     The implementation is based on Tensorflow.
     """
 
-    def __init__(self, model_fn: Callable[[], Model], loss_fn: Callable[[Any, array], array], data: array):
+    def __init__(self, model_fn: Callable[[], Model], loss_fn: Callable[[Any, ndarray], ndarray], data: ndarray):
         """
         :param model_fn: Function used to create instance of model, should be the same as server.
         :param loss_fn: Function that receives model and data batch, and return the loss value caluclated by tf.keras.losses.
@@ -36,7 +36,7 @@ class FedAvgClient:
         args = [iter(self.data)] * minibatch_size
         return list([e for e in t if e != None] for t in itertools.zip_longest(*args))
 
-    def train_step(self, minibatch: Union[array, list]):
+    def train_step(self, minibatch: Union[ndarray, list]):
         """Function for training the model using one minibatch.
 
         :param minibatch: List of data of minibacth.
@@ -46,7 +46,7 @@ class FedAvgClient:
             grads = tape.gradient(loss, self.model.trainable_variables)
             self.optimizer.apply_gradients(zip(grads, self.model.trainable_variables))
 
-    def train(self, global_weights: array, minibatch_size: int, epoch: int):
+    def train(self, global_weights: ndarray, minibatch_size: int, epoch: int):
         """Function for training the model.
 
         :param global_weights: Global weights received from server.
@@ -105,7 +105,7 @@ class FedAvgServer:
         :param epoch: Number of epoch used by client for training.
         """
         threads = list()
-        res = [(np.array([]), 0)] * len(clients)  # type: List[Tuple[array, int]]
+        res = [(np.array([]), 0)] * len(clients)  # type: List[Tuple[ndarray, int]]
         for i in range(len(clients)):
             x = threading.Thread(target=self.train_client, args=(clients[i], minibatch_size, epoch, res, i))
             threads.append(x)
@@ -116,7 +116,7 @@ class FedAvgServer:
         weights = [i[0] for i in res]
         number = [i[1] for i in res]
         number = np.array(number) / sum(number)
-        new_weights = sum([np.array(weights[i], dtype=object)*number[i] for i in range(len(clients))])  # type: array
+        new_weights = sum([np.array(weights[i], dtype=object)*number[i] for i in range(len(clients))])  # type: ndarray
         self.model.set_weights(new_weights)
 
     def select_clients(self, number: int) -> List[Any]:
@@ -128,7 +128,7 @@ class FedAvgServer:
         return np.random.choice(self.clients, size=min(number, len(self.clients)), replace=False)
 
 
-def flat_clip(gradient: array, gradient_norm_bound: float) -> array:
+def flat_clip(gradient: ndarray, gradient_norm_bound: float) -> ndarray:
     """Helper function used to clip gradient with L2-norm bound of gradient_norm_bound.
 
     :param gradient: The gradient to be clipepd.
@@ -145,7 +145,7 @@ class DPFedAvgClient:
     The implementation is based on Tensorflow.
     """
 
-    def __init__(self, model_fn: Callable[[], Model], loss_fn: Callable[[Any, array], array], data: array):
+    def __init__(self, model_fn: Callable[[], Model], loss_fn: Callable[[Any, ndarray], ndarray], data: ndarray):
         """
         :param model_fn: Function used to create instance of model, should be the same as server.
         :param loss_fn: Function that receives model and data batch, and return the loss value caluclated by tf.keras.losses.
@@ -165,7 +165,7 @@ class DPFedAvgClient:
         args = [iter(self.data)] * minibatch_size
         return list([e for e in t if e != None] for t in itertools.zip_longest(*args))
 
-    def train_step(self, minibatch: Union[array, list], initial_weights: array,
+    def train_step(self, minibatch: Union[ndarray, list], initial_weights: ndarray,
                    gradient_norm_bound: float):
         """Function for training the model using one minibatch.
 
@@ -182,7 +182,7 @@ class DPFedAvgClient:
             updated_weights = initial_weights + flat_clip(updated_weights - initial_weights, gradient_norm_bound)
             self.model.set_weights(updated_weights)
 
-    def train(self, global_weights: array, minibatch_size: int, epoch: int, gradient_norm_bound: float):
+    def train(self, global_weights: ndarray, minibatch_size: int, epoch: int, gradient_norm_bound: float):
         """Function for training the model.
 
         :param global_weights: Global weights received from server.
@@ -254,7 +254,7 @@ class DPFedAvgServer:
         :param noise_scale: Value of noise scale. Higher noise scale correspond to higher noise and lower privacy budget.
         """
         threads = list()
-        res = [(np.array([]), 0)] * len(clients)  # type: List[Tuple[array, int]]
+        res = [(np.array([]), 0)] * len(clients)  # type: List[Tuple[ndarray, int]]
         for i in range(len(clients)):
             x = threading.Thread(target=self.train_client,
                                  args=(clients[i], minibatch_size, epoch, gradient_norm_bound, res, i))
@@ -267,7 +267,7 @@ class DPFedAvgServer:
         grad = [i[0] for i in res]
         number = [i[1] for i in res]
         number = np.array(number) / self.total_data
-        total_grad = sum([np.array(grad[i], dtype=object)*number[i] for i in range(len(clients))])  # type: array
+        total_grad = sum([np.array(grad[i], dtype=object)*number[i] for i in range(len(clients))])  # type: ndarray
         total_grad /= qW
 
         sigma = noise_scale*gradient_norm_bound/qW
