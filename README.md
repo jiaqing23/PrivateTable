@@ -32,3 +32,6 @@ This library is to help library users to implement secure ways to handle data wi
 > Currently this part only support Tensorflow.
 - Federated Averaging (FedAvg)
 - DP-FedAvg
+
+## Documentation
+https://private-table.readthedocs.io/
